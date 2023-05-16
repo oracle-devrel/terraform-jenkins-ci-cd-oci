@@ -8,7 +8,7 @@ Deploy a Jenkins CI/CD pipeline using Docker containers on Oracle Linux VM
 ## Reference Architecture 
 The final reference architecture after the deployment and some key components are described below.
 
-![Reference Architecture](https://github.com/ahmedmansour5/Jenkins-CI-CD-OCI/blob/main/Image/Architecture.png)
+![Reference Architecture](https://github.com/oracle-devrel/terraform-jenkins-ci-cd-oci/blob/main/Image/Architecture.png)
 
 
 ## Prerequisites
@@ -29,7 +29,7 @@ The pipeline can be deployed on [Oracle Cloud Infrastructure][oci] using the bel
 ## Deploy Using Oracle Resource Manager
 The steps below guide you through deploying the pipeline on your tenancy using the OCI Resource Manager:
 
-1. Download the [`jenkins-stack-configuration.zip`](https://github.com/ahmedmansour5/Jenkins-CI-CD-OCI/releases/latest/download/jenkins-stack-configuration.zip) file.
+1. Download the [`jenkins-stack-configuration.zip`](https://github.com/oracle-devrel/terraform-jenkins-ci-cd-oci/releases/latest/download/jenkins-stack-configuration.zip) file.
 2. [Login](https://cloud.oracle.com/resourcemanager/stacks/create) to Oracle Cloud Infrastructure to import the stack
     > `Home > Developer Services > Resource Manager > Stacks > Create Stack`
 3. Upload the `jenkins-stack-configuration.zip` file that was downloaded earlier, and provide a name and description for the stack
@@ -47,7 +47,7 @@ The private ssh key for the Linux VM will be displayed along with the public ip 
 ### Clone the Repository
 Now, you'll want a local copy of this repo. You can make that with the commands:
 
-    git clone https://github.com/ahmedmansour5/Jenkins-CI-CD-OCI.git
+    git clone https://github.com/oracle-devrel/terraform-jenkins-ci-cd-oci
     cd Jenkins-CI-CD-OCI
     ls
 
@@ -100,4 +100,4 @@ ORACLE AND ITS AFFILIATES DO NOT PROVIDE ANY WARRANTY WHATSOEVER, EXPRESS OR IMP
 [tf]: https://www.terraform.io
 [orm_landing]:https://www.oracle.com/cloud/systems-management/resource-manager/
 [magic_button]: https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg
-[magic_rm_stack]: https://cloud.oracle.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/ahmedmansour5/Jenkins-CI-CD-OCI/releases/latest/download/jenkins-stack-configuration.zip
+[magic_rm_stack]: https://cloud.oracle.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/oracle-devrel/terraform-jenkins-ci-cd-oci/releases/latest/download/jenkins-stack-configuration.zip
