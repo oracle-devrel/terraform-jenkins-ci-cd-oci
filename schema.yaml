@@ -1,0 +1,208 @@
+title: "Deploy a containerized Jenkins instance on OCI"
+description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.longDescription()} 
+schemaVersion: 1.1.0
+version: "20190304"
+locale: "en"
+
+variableGroups:
+- title: ${Messages.solutionsHub.generalConfig()}
+  visible: false
+  variables:
+  - tenancy_ocid
+  - region
+  - instance_os
+  - linux_os_version
+  - label_prefix
+
+- title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variableGroups.jenkinsConfigurationTitle()}
+  visible: true  
+  variables:
+    - jenkins_user
+    - jenkins_password
+    - show_advanced
+
+- title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variableGroups.instanceConfigurationTitle()}
+  visible: 
+      and:
+        - show_advanced
+  variables:
+    - compartment_ocid
+    - availability_domain_name 
+    - instance_shape
+    - instance_ocpus
+    - instance_shape_config_memory_in_gbs
+    - generate_public_ssh_key
+    - public_ssh_key
+
+- title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variableGroups.networkConfigurationTitle()}
+  visible: 
+      and:
+        - show_advanced
+  variables:
+     - vcn
+     - vcn_cidr
+
+outputGroups:
+- title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.outputGroups.serviceEndpointsTitle()}
+  outputs:
+    - jenkins_public_ip
+- title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.outputGroups.generatedPasswordsTitle()}
+  outputs:
+    - generated_ssh_private_key
+
+outputs:
+  jenkins_public_ip:
+    type: link
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.outputs.jenkinsPublicIpTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.outputs.jenkinsPublicIpDescription()}
+  generated_ssh_private_key:
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.outputs.generatedSshPrivateKeyTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.outputs.generatedSshPrivateKeyDescription()}
+    type: copyableString
+    visible: true
+
+primaryOutputButton: jenkins_public_ip
+
+variables:
+
+  show_advanced:
+    type: boolean
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.showAdvancedTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.showAdvancedDescription()}
+    visible: false
+    default: false
+
+
+
+  jenkins_user:
+    type: string
+    required: true
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.jenkinsUserTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.jenkinsUserDescription()}
+    minLength: 2
+    maxLength: 14
+    pattern: "^[a-zA-Z][a-zA-Z0-9]+$"
+    visible: true
+     
+
+  jenkins_password:
+    type: password
+    required: true
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.jenkinsPasswordTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.jenkinsPasswordDescription()}
+    #pattern: "^(?=[a-zA-Z0-9!@#%^*_+\-:?.,\[\]\{\}]{8,32}$)(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*"
+    pattern: "^(?=.*[!@#%^*_+\\-:?.,\\[\\]\\{\\}])(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?!.*[$\\(\\)]).{8,32}$"
+    visible: true
+      
+
+
+# Network
+  vcn:
+    type: string
+    visible: 
+      and:
+        - show_advanced
+    required: true
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.vcnTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.vcnDescription()}
+
+  vcn_cidr:
+    type: string
+    visible: 
+      and:
+        - show_advanced
+    required: false
+    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.vcnCidrTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.vcnCidrDescription()}
+
+# Instance 
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    required: true
+    visible: 
+      and:
+        - show_advanced
+    title: ${Messages.solutionsHub.genericVariables.compartment.title()}
+    description: ${Messages.solutionsHub.genericVariables.compartment.description()}
+
+  availability_domain_name:
+    type: oci:identity:availabilitydomain:name
+    required: true
+    visible: 
+      and:
+        - show_advanced
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.availabilityDomainNameTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.availabilityDomainNameDescription()}
+    dependsOn:
+      regionName: ${region}
+      compartmentId: ${compartment_ocid}
+
+  instance_shape:
+    type: oci:core:instanceshape:name
+    required: false
+    visible: 
+      and:
+        - show_advanced
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.instanceShapeTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.instanceShapeDescription()}
+    default: "VM.Standard2.1"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  instance_os:
+    type: enum
+    required: false
+    visible: 
+      and:
+        - show_advanced
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.instanceOsTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.instanceOsDescription()}
+    default: "Oracle Linux"
+    enum:
+      - "Oracle Linux"
+
+  linux_os_version:
+    type: enum
+    required: false
+    visible: 
+      and:
+        - show_advanced
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.linuxOsVersionTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.linuxOsVersionDescription()}
+    default: "7.8"
+    enum:
+      - "7.8"
+
+  label_prefix:
+    type: string
+    required: false
+    visible: false
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.labelPrefixTitle()}
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.labelPrefixDescription()}
+
+  
+
+  generate_public_ssh_key:
+    type: boolean
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.generatePublicSshKeyTitle()}
+    #description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.generatePublicSshKeyDescription()}
+    required: true
+    visible: #($show_advanced  == ""Yes"")
+      and:
+        - show_advanced 
+
+  public_ssh_key:
+    type: oci:core:ssh:publickey
+    title: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.publicSshKeyTitle()}
+    additionalProps:
+      allowMultiple: true
+    description: ${Messages.solutionsHub.solutions.jenkinsQuickstarts.variables.publicSshKeyDescription()}
+    required: false
+    pattern: "((^(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+\/]+[=]{0,3})( [^,]*)?)(,((ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+\/]+[=]{0,3})( [^,]*)?)*$"
+    visible: 
+      and:
+        - show_advanced
+        - not:
+          - generate_public_ssh_key
+

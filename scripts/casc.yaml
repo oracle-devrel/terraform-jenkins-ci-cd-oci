@@ -1,0 +1,34 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - basicSSHUserPrivateKey:
+          id: "agent"
+          privateKeySource:
+            directEntry:
+            # add the ssh-private-key for ssh connection between controller/agent / same key as the one used for VM ssh
+              privateKey: ${readFile:${JENKINS_AGENT_SSH_PRIVKEY}}
+          scope: GLOBAL
+          username: "jenkins"
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+       - id: ${JENKINS_ADMIN_ID}
+         password: ${JENKINS_ADMIN_PASSWORD}
+  authorizationStrategy:
+      loggedInUsersCanDoAnything:
+        allowAnonymousRead: false
+  nodes:
+  - permanent:
+      launcher:
+        ssh:
+          credentialsId: "agent"
+          host: "agent"
+          javaPath: "/opt/java/openjdk/bin/java"
+          port: 22
+          sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
+      name: "jenkins_agent"
+      remoteFS: "/home/jenkins/agent"
+      retentionStrategy: "always"
